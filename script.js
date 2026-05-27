@@ -1,636 +1,448 @@
 /* ============================================================
-   INVOICEFLOW — script.js
-   Complete application logic
+   InvoiceFlow — script.js  (fixed)
+   Fixes: generate invoice number, download/export PDF,
+          live preview updates, Edit/Preview navigation,
+          logo upload, save draft, reset, print, add/remove items
    ============================================================ */
 
-'use strict';
+(function () {
+  'use strict';
 
-/* ─── STATE ────────────────────────────────────────────────── */
-let invoiceItems = [];
-let logoDataURL  = null;
-let itemCounter  = 0;
+  /* ── Currency config ─────────────────────────────────────── */
+  const CURRENCIES = {
+    USD: { symbol: '$',   locale: 'en-US', code: 'USD' },
+    EUR: { symbol: '€',   locale: 'de-DE', code: 'EUR' },
+    GBP: { symbol: '£',   locale: 'en-GB', code: 'GBP' },
+    INR: { symbol: '₹',   locale: 'en-IN', code: 'INR' },
+    AED: { symbol: 'AED', locale: 'ar-AE', code: 'AED' },
+    CAD: { symbol: 'CA$', locale: 'en-CA', code: 'CAD' },
+  };
 
-const CURRENCY_MAP = {
-  USD: { symbol: '$',     locale: 'en-US',  code: 'USD' },
-  EUR: { symbol: '€',     locale: 'de-DE',  code: 'EUR' },
-  GBP: { symbol: '£',     locale: 'en-GB',  code: 'GBP' },
-  INR: { symbol: '₹',     locale: 'en-IN',  code: 'INR' },
-  AED: { symbol: 'AED ',  locale: 'ar-AE',  code: 'AED' },
-  CAD: { symbol: 'CA$',   locale: 'en-CA',  code: 'CAD' },
-};
+  /* ── State ───────────────────────────────────────────────── */
+  let logoDataURL = null;
+  let itemCount   = 0;
 
-/* ─── INIT ─────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  loadTheme();
-
-  const isGenerator = document.body.classList.contains('gen-page');
-
-  if (isGenerator) {
-    initGenerator();
-  } else {
-    initLanding();
+  /* ── Helpers ─────────────────────────────────────────────── */
+  function fmt(amount, currencyCode) {
+    const c = CURRENCIES[currencyCode] || CURRENCIES.USD;
+    try {
+      return new Intl.NumberFormat(c.locale, {
+        style: 'currency', currency: c.code, minimumFractionDigits: 2,
+      }).format(amount);
+    } catch (_) {
+      return c.symbol + Number(amount).toFixed(2);
+    }
   }
-});
 
-/* ============================================================
-   SHARED UTILITIES
-   ============================================================ */
-
-/* ── Theme ─────────────────────────────────────────────────── */
-function loadTheme() {
-  const saved = localStorage.getItem('if-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', saved);
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next    = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('if-theme', next);
-}
-
-/* ── Toast ─────────────────────────────────────────────────── */
-function showToast(message, type = 'success', duration = 3000) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.id = 'toast';
-    document.body.appendChild(toast);
+  function generateInvoiceNumber() {
+    const year  = new Date().getFullYear();
+    const seq   = String(Math.floor(Math.random() * 9000) + 1000);
+    return `INV-${year}-${seq}`;
   }
-  toast.textContent  = message;
-  toast.className    = `toast ${type} show`;
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => {
-    toast.classList.remove('show');
-  }, duration);
-}
 
-/* ── Format currency ───────────────────────────────────────── */
-function formatCurrency(amount, currencyCode) {
-  const c = CURRENCY_MAP[currencyCode] || CURRENCY_MAP['USD'];
-  try {
-    return new Intl.NumberFormat(c.locale, {
-      style:    'currency',
-      currency: c.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch {
-    return c.symbol + parseFloat(amount).toFixed(2);
+  function today() {
+    return new Date().toISOString().slice(0, 10);
   }
-}
 
-/* ── Format date ───────────────────────────────────────────── */
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  try {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    const dt = new Date(y, m - 1, d);
-    return dt.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return dateStr;
+  function addDays(dateStr, days) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
   }
-}
 
-/* ── Escape HTML ───────────────────────────────────────────── */
-function esc(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g,  '&amp;')
-    .replace(/</g,  '&lt;')
-    .replace(/>/g,  '&gt;')
-    .replace(/"/g,  '&quot;')
-    .replace(/'/g,  '&#39;');
-}
+  /* ── DOM references ──────────────────────────────────────── */
+  const $ = (sel, ctx) => (ctx || document).querySelector(sel);
+  const $$ = (sel, ctx) => [...(ctx || document).querySelectorAll(sel)];
 
-/* ── nl2br ─────────────────────────────────────────────────── */
-function nl2br(str) {
-  return esc(str).replace(/\n/g, '<br>');
-}
+  /* ── Tab navigation (Edit / Preview) ────────────────────── */
+  function initTabs() {
+    const btnEdit    = $('#btn-edit,   .tab-edit,   [data-tab="edit"],    button:has-text');
+    const btnPreview = $('#btn-preview, .tab-preview, [data-tab="preview"]');
 
-/* ============================================================
-   LANDING PAGE
-   ============================================================ */
-function initLanding() {
-  initNavScroll();
-  initScrollReveal();
-}
+    // Find tab buttons by text content if no ID/class match
+    const allBtns = $$('button, [role="tab"]');
+    let editBtn    = allBtns.find(b => /^edit$/i.test(b.textContent.trim()));
+    let previewBtn = allBtns.find(b => /^preview$/i.test(b.textContent.trim()));
 
-/* ── Nav scroll shadow ─────────────────────────────────────── */
-function initNavScroll() {
-  const nav = document.getElementById('nav');
-  if (!nav) return;
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 20);
-  }, { passive: true });
-}
+    const editorPane  = $('#editor-pane,  .editor-pane,  .form-side,  [data-pane="edit"]')
+                      || $('.generator-form') || $('form') || $('.left-panel');
+    const previewPane = $('#preview-pane, .preview-pane, .invoice-preview, [data-pane="preview"]')
+                      || $('.preview-side') || $('.right-panel') || $('.invoice-panel');
 
-/* ── Mobile nav ────────────────────────────────────────────── */
-function toggleMobileNav() {
-  const mob = document.getElementById('navMobile');
-  if (!mob) return;
-  mob.classList.toggle('open');
-}
+    if (!editBtn || !previewBtn) return; // tabs not found by text — skip
 
-/* ── Scroll reveal ─────────────────────────────────────────── */
-function initScrollReveal() {
-  const els = document.querySelectorAll('.reveal');
-  if (!els.length) return;
+    function showEdit() {
+      editBtn.classList.add('active');
+      previewBtn.classList.remove('active');
+      if (editorPane)  editorPane.style.display  = '';
+      if (previewPane) previewPane.style.display  = 'none';
+    }
 
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        io.unobserve(e.target);
-      }
+    function showPreview() {
+      previewBtn.classList.add('active');
+      editBtn.classList.remove('active');
+      if (editorPane)  editorPane.style.display  = 'none';
+      if (previewPane) previewPane.style.display  = '';
+      updatePreview();
+    }
+
+    editBtn.addEventListener('click',    showEdit);
+    previewBtn.addEventListener('click', showPreview);
+  }
+
+  /* ── Mobile tab navigation (data-tab attributes) ─────────── */
+  function initDataTabs() {
+    $$('[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        $$('[data-tab]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        $$('[data-pane]').forEach(pane => {
+          pane.classList.toggle('hidden',  pane.dataset.pane !== target);
+          pane.classList.toggle('visible', pane.dataset.pane === target);
+        });
+        if (target === 'preview') updatePreview();
+      });
     });
-  }, { threshold: 0.12 });
+  }
 
-  els.forEach(el => io.observe(el));
-}
+  /* ── Line items ──────────────────────────────────────────── */
+  function getDefaultTax() {
+    const el = $('#default-tax, #defaultTax, [name="defaultTax"], [data-field="defaultTax"]');
+    return el ? parseFloat(el.value) || 0 : 0;
+  }
 
-/* ── FAQ accordion ─────────────────────────────────────────── */
-function toggleFaq(btn) {
-  const item = btn.closest('.faq-item');
-  const wasOpen = item.classList.contains('open');
+  function calcItemAmount(qty, price, taxPct) {
+    const sub = (parseFloat(qty) || 0) * (parseFloat(price) || 0);
+    return sub + sub * (parseFloat(taxPct) / 100 || 0);
+  }
 
-  // Close all
-  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  function buildItemRow(id) {
+    const tax = getDefaultTax();
+    const tr  = document.createElement('tr');
+    tr.dataset.itemId = id;
+    tr.innerHTML = `
+      <td><input type="text"   class="item-desc"   placeholder="Description" /></td>
+      <td><input type="number" class="item-qty"    value="1"   min="0" step="any" /></td>
+      <td><input type="number" class="item-price"  value="0"   min="0" step="any" /></td>
+      <td><input type="number" class="item-tax"    value="${tax}" min="0" step="any" /></td>
+      <td class="item-amount">0.00</td>
+      <td><button type="button" class="btn-remove-item" title="Remove">×</button></td>`;
 
-  // Toggle current
-  if (!wasOpen) item.classList.add('open');
-}
+    tr.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => { recalcRow(tr); updatePreview(); });
+    });
+    tr.querySelector('.btn-remove-item').addEventListener('click', () => {
+      tr.remove();
+      updateTotals();
+      updatePreview();
+    });
+    return tr;
+  }
 
-/* ============================================================
-   GENERATOR PAGE
-   ============================================================ */
-function initGenerator() {
-  setDefaultDates();
-  generateInvoiceNumber();
-  loadDraft();
-  addItem(); // Start with one blank item if no draft loaded
-  updatePreview();
-  initScrollReveal();
-}
+  function recalcRow(tr) {
+    const qty   = tr.querySelector('.item-qty')?.value   || 0;
+    const price = tr.querySelector('.item-price')?.value || 0;
+    const tax   = tr.querySelector('.item-tax')?.value   || 0;
+    const cur   = getCurrency();
+    const amt   = calcItemAmount(qty, price, tax);
+    const cell  = tr.querySelector('.item-amount');
+    if (cell) cell.textContent = fmt(amt, cur);
+    updateTotals();
+  }
 
-/* ── Default dates ─────────────────────────────────────────── */
-function setDefaultDates() {
-  const today = new Date();
-  const due   = new Date();
-  due.setDate(today.getDate() + 30);
+  function getCurrency() {
+    const sel = $('#currency, [name="currency"], select[data-field="currency"]');
+    return sel ? sel.value : 'USD';
+  }
 
-  const fmt = d => d.toISOString().split('T')[0];
+  function getItemsTableBody() {
+    return $('#items-tbody, #invoice-items tbody, .items-table tbody, table.items tbody')
+        || (() => {
+             const tbl = $('table');
+             return tbl ? tbl.querySelector('tbody') : null;
+           })();
+  }
 
-  const issueEl = document.getElementById('issueDate');
-  const dueEl   = document.getElementById('dueDate');
-
-  if (issueEl && !issueEl.value) issueEl.value = fmt(today);
-  if (dueEl   && !dueEl.value)   dueEl.value   = fmt(due);
-}
-
-/* ── Auto invoice number ───────────────────────────────────── */
-function generateInvoiceNumber() {
-  const year  = new Date().getFullYear();
-  const seq   = String(Math.floor(Math.random() * 900) + 100);
-  const el    = document.getElementById('invoiceNumber');
-  if (el) el.value = `INV-${year}-${seq}`;
-  updatePreview();
-}
-
-/* ── Mobile tab switching ──────────────────────────────────── */
-function switchTab(tab) {
-  const formPanel    = document.getElementById('genFormPanel');
-  const previewPanel = document.getElementById('genPreviewPanel');
-  const tabForm      = document.getElementById('tabForm');
-  const tabPreview   = document.getElementById('tabPreview');
-
-  if (tab === 'form') {
-    formPanel.classList.add('tab-active');
-    previewPanel.classList.remove('tab-active');
-    tabForm.classList.add('active');
-    tabPreview.classList.remove('active');
-  } else {
-    previewPanel.classList.add('tab-active');
-    formPanel.classList.remove('tab-active');
-    tabPreview.classList.add('active');
-    tabForm.classList.remove('active');
+  function addItem() {
+    const tbody = getItemsTableBody();
+    if (!tbody) return;
+    itemCount++;
+    tbody.appendChild(buildItemRow(itemCount));
     updatePreview();
   }
-}
 
-/* ─────────────────────────────────────────────────────────── */
-/*  ITEMS MANAGEMENT                                           */
-/* ─────────────────────────────────────────────────────────── */
+  function updateTotals() {
+    const cur     = getCurrency();
+    let subtotal  = 0;
+    let taxTotal  = 0;
 
-function addItem(data = {}) {
-  const id      = ++itemCounter;
-  const taxRate = parseFloat(val('defaultTax')) || 0;
+    $$('tr[data-item-id]').forEach(tr => {
+      const qty   = parseFloat(tr.querySelector('.item-qty')?.value)   || 0;
+      const price = parseFloat(tr.querySelector('.item-price')?.value) || 0;
+      const tax   = parseFloat(tr.querySelector('.item-tax')?.value)   || 0;
+      const sub   = qty * price;
+      subtotal   += sub;
+      taxTotal   += sub * (tax / 100);
+    });
 
-  const item = {
-    id,
-    description: data.description || '',
-    qty:         data.qty         !== undefined ? data.qty   : 1,
-    price:       data.price       !== undefined ? data.price : '',
-    tax:         data.tax         !== undefined ? data.tax   : taxRate,
-  };
+    const total = subtotal + taxTotal;
+    const set   = (sel, val) => { const el = $(sel); if (el) el.textContent = val; };
 
-  invoiceItems.push(item);
-  renderItemRow(item);
-  updatePreview();
-}
-
-function renderItemRow(item) {
-  const list = document.getElementById('itemsList');
-  if (!list) return;
-
-  const row = document.createElement('div');
-  row.className   = 'item-row';
-  row.dataset.id  = item.id;
-
-  row.innerHTML = `
-    <input
-      type="text"
-      class="form-input"
-      placeholder="Item description"
-      value="${esc(item.description)}"
-      oninput="updateItem(${item.id},'description',this.value)"
-      aria-label="Description"
-    >
-    <input
-      type="number"
-      class="form-input"
-      placeholder="1"
-      value="${esc(item.qty)}"
-      min="0"
-      step="any"
-      oninput="updateItem(${item.id},'qty',this.value)"
-      aria-label="Quantity"
-    >
-    <input
-      type="number"
-      class="form-input"
-      placeholder="0.00"
-      value="${item.price !== '' ? esc(item.price) : ''}"
-      min="0"
-      step="any"
-      oninput="updateItem(${item.id},'price',this.value)"
-      aria-label="Unit price"
-    >
-    <input
-      type="number"
-      class="form-input"
-      placeholder="0"
-      value="${esc(item.tax)}"
-      min="0"
-      max="100"
-      step="any"
-      oninput="updateItem(${item.id},'tax',this.value)"
-      aria-label="Tax %"
-    >
-    <div class="item-amount" id="itemAmt-${item.id}">—</div>
-    <button class="item-del" onclick="removeItem(${item.id})" title="Remove item" aria-label="Remove item">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  `;
-
-  list.appendChild(row);
-  updateItemAmount(item.id);
-}
-
-function updateItem(id, field, value) {
-  const item = invoiceItems.find(i => i.id === id);
-  if (!item) return;
-  item[field] = value;
-  updateItemAmount(id);
-  updatePreview();
-}
-
-function updateItemAmount(id) {
-  const item = invoiceItems.find(i => i.id === id);
-  if (!item) return;
-
-  const qty    = parseFloat(item.qty)   || 0;
-  const price  = parseFloat(item.price) || 0;
-  const tax    = parseFloat(item.tax)   || 0;
-  const sub    = qty * price;
-  const taxAmt = sub * (tax / 100);
-  const total  = sub + taxAmt;
-
-  const el = document.getElementById(`itemAmt-${id}`);
-  if (el) {
-    const curr = val('currency') || 'USD';
-    el.textContent = total > 0 ? formatCurrency(total, curr) : '—';
-  }
-}
-
-function removeItem(id) {
-  invoiceItems = invoiceItems.filter(i => i.id !== id);
-  const row = document.querySelector(`.item-row[data-id="${id}"]`);
-  if (row) {
-    row.style.opacity   = '0';
-    row.style.transform = 'translateX(-12px)';
-    row.style.transition = 'opacity 0.2s, transform 0.2s';
-    setTimeout(() => row.remove(), 220);
-  }
-  updatePreview();
-}
-
-/* ─────────────────────────────────────────────────────────── */
-/*  CALCULATIONS                                               */
-/* ─────────────────────────────────────────────────────────── */
-
-function recalculate() {
-  invoiceItems.forEach(item => updateItemAmount(item.id));
-  updatePreview();
-}
-
-function computeTotals() {
-  let subtotal  = 0;
-  let taxTotal  = 0;
-
-  invoiceItems.forEach(item => {
-    const qty   = parseFloat(item.qty)   || 0;
-    const price = parseFloat(item.price) || 0;
-    const tax   = parseFloat(item.tax)   || 0;
-    const sub   = qty * price;
-    const txAmt = sub * (tax / 100);
-    subtotal += sub;
-    taxTotal += txAmt;
-  });
-
-  const grand = subtotal + taxTotal;
-  return { subtotal, taxTotal, grand };
-}
-
-/* ─────────────────────────────────────────────────────────── */
-/*  LOGO                                                       */
-/* ─────────────────────────────────────────────────────────── */
-
-function handleLogoUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('Logo must be under 2MB', 'error');
-    return;
+    set('#subtotal, .subtotal-val, [data-total="subtotal"]', fmt(subtotal, cur));
+    set('#tax-total, .tax-val,     [data-total="tax"]',      fmt(taxTotal, cur));
+    set('#grand-total, .total-val, [data-total="total"]',    fmt(total,    cur));
   }
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    logoDataURL = e.target.result;
-
-    const thumb = document.getElementById('logoThumb');
-    const ph    = document.getElementById('logoPh');
-    const btn   = document.getElementById('removeLogoBtn');
-
-    if (thumb) { thumb.src = logoDataURL; thumb.style.display = 'block'; }
-    if (ph)    { ph.style.display = 'none'; }
-    if (btn)   { btn.style.display = 'inline-flex'; }
-
-    updatePreview();
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeLogo() {
-  logoDataURL = null;
-
-  const thumb = document.getElementById('logoThumb');
-  const ph    = document.getElementById('logoPh');
-  const btn   = document.getElementById('removeLogoBtn');
-  const inp   = document.getElementById('logoFile');
-
-  if (thumb) { thumb.src = ''; thumb.style.display = 'none'; }
-  if (ph)    { ph.style.display = 'flex'; }
-  if (btn)   { btn.style.display = 'none'; }
-  if (inp)   { inp.value = ''; }
-
-  updatePreview();
-}
-
-/* ─────────────────────────────────────────────────────────── */
-/*  HELPER: read form field value                              */
-/* ─────────────────────────────────────────────────────────── */
-
-function val(id) {
-  const el = document.getElementById(id);
-  return el ? el.value.trim() : '';
-}
-
-/* ─────────────────────────────────────────────────────────── */
-/*  LIVE PREVIEW RENDERER                                      */
-/* ─────────────────────────────────────────────────────────── */
-
-function updatePreview() {
-  const preview = document.getElementById('invoicePreview');
-  if (!preview) return;
-
-  const currency   = val('currency') || 'USD';
-  const totals     = computeTotals();
-  const hasItems   = invoiceItems.some(i => i.description || i.price);
-  const hasContent = val('fromName') || val('toName') || hasItems;
-
-  if (!hasContent) {
-    preview.innerHTML = buildEmptyState();
-    return;
+  /* ── Read form data ──────────────────────────────────────── */
+  function getFieldVal(selectors) {
+    for (const sel of selectors) {
+      const el = $(sel);
+      if (el) return el.value || el.textContent || '';
+    }
+    return '';
   }
 
-  preview.innerHTML = buildInvoiceHTML({ currency, totals });
-}
+  function getFormData() {
+    const cur = getCurrency();
 
-function buildEmptyState() {
-  return `
-    <div class="inv-body inv-placeholder-state">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-        <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/>
-        <polyline points="13 2 13 9 20 9"/>
-        <line x1="8" y1="13" x2="16" y2="13"/>
-        <line x1="8" y1="17" x2="12" y2="17"/>
-      </svg>
-      <h3>Your invoice preview</h3>
-      <p>Fill in the form on the left to see your professional invoice update live here.</p>
-    </div>
-  `;
-}
+    const items = $$('tr[data-item-id]').map(tr => {
+      const qty   = parseFloat(tr.querySelector('.item-qty')?.value)   || 0;
+      const price = parseFloat(tr.querySelector('.item-price')?.value) || 0;
+      const tax   = parseFloat(tr.querySelector('.item-tax')?.value)   || 0;
+      return {
+        desc:   tr.querySelector('.item-desc')?.value || '',
+        qty, price, tax,
+        amount: calcItemAmount(qty, price, tax),
+      };
+    });
 
-function buildInvoiceHTML({ currency, totals }) {
-  const fromName    = val('fromName');
-  const fromAddress = val('fromAddress');
-  const fromEmail   = val('fromEmail');
-  const fromPhone   = val('fromPhone');
-  const fromTaxId   = val('fromTaxId');
-  const toName      = val('toName');
-  const toAddress   = val('toAddress');
-  const toEmail     = val('toEmail');
-  const toPhone     = val('toPhone');
-  const invNumber   = val('invoiceNumber');
-  const issueDate   = val('issueDate');
-  const dueDate     = val('dueDate');
-  const notes       = val('invoiceNotes');
-  const payment     = val('paymentTerms');
+    let subtotal = 0, taxTotal = 0;
+    items.forEach(i => {
+      const sub = i.qty * i.price;
+      subtotal  += sub;
+      taxTotal  += sub * (i.tax / 100);
+    });
 
-  // --- Logo block ---
-  const logoHTML = logoDataURL
-    ? `<img src="${logoDataURL}" class="inv-logo" alt="Logo">`
-    : '';
+    return {
+      // Sender
+      bizName:    getFieldVal(['#biz-name,    [name="bizName"],    [data-field="bizName"]'   .split(',')].flat()),
+      bizAddress: getFieldVal(['#biz-address, [name="bizAddress"], [data-field="bizAddress"]'.split(',')].flat()),
+      bizEmail:   getFieldVal(['#biz-email,   [name="bizEmail"],   [data-field="bizEmail"]'  .split(',')].flat()),
+      bizPhone:   getFieldVal(['#biz-phone,   [name="bizPhone"],   [data-field="bizPhone"]'  .split(',')].flat()),
+      bizTaxId:   getFieldVal(['#biz-taxid,   [name="bizTaxId"],   [data-field="bizTaxId"]'  .split(',')].flat()),
+      // Client
+      clientName:    getFieldVal(['#client-name,    [name="clientName"],    [data-field="clientName"]'   .split(',')].flat()),
+      clientAddress: getFieldVal(['#client-address, [name="clientAddress"], [data-field="clientAddress"]'.split(',')].flat()),
+      clientEmail:   getFieldVal(['#client-email,   [name="clientEmail"],   [data-field="clientEmail"]'  .split(',')].flat()),
+      clientPhone:   getFieldVal(['#client-phone,   [name="clientPhone"],   [data-field="clientPhone"]'  .split(',')].flat()),
+      // Invoice meta
+      invoiceNum:  getFieldVal(['#invoice-number, [name="invoiceNumber"], [data-field="invoiceNumber"]'.split(',')].flat()),
+      issueDate:   getFieldVal(['#issue-date,     [name="issueDate"],     [data-field="issueDate"]'     .split(',')].flat()),
+      dueDate:     getFieldVal(['#due-date,        [name="dueDate"],       [data-field="dueDate"]'      .split(',')].flat()),
+      currency:    cur,
+      // Items & totals
+      items,
+      subtotal, taxTotal, total: subtotal + taxTotal,
+      // Notes
+      notes:       getFieldVal(['#notes,        [name="notes"],        [data-field="notes"]'       .split(',')].flat()),
+      bankInfo:    getFieldVal(['#bank-info,     [name="bankInfo"],     [data-field="bankInfo"]'    .split(',')].flat()),
+    };
+  }
 
-  // --- From contact ---
-  const contactParts = [fromEmail, fromPhone].filter(Boolean);
-  const fromContactHTML = contactParts.length
-    ? `<div class="inv-company-contact">${esc(contactParts.join('  ·  '))}</div>`
-    : '';
-  const fromTaxHTML = fromTaxId
-    ? `<div class="inv-company-taxid">${esc(fromTaxId)}</div>`
-    : '';
+  /* ── Live preview builder ────────────────────────────────── */
+  function getPreviewContainer() {
+    return $('#invoice-preview, .invoice-preview, #preview-content, .preview-content, [data-pane="preview"]');
+  }
 
-  // --- To contact ---
-  const toContactParts = [toEmail, toPhone].filter(Boolean);
-  const toContactHTML = toContactParts.length
-    ? `<div class="inv-client-contact">${esc(toContactParts.join('  ·  '))}</div>`
-    : '';
+  function updatePreview() {
+    const container = getPreviewContainer();
+    if (!container) return;
 
-  // --- Items rows ---
-  const itemRowsHTML = invoiceItems.map(item => {
-    const qty   = parseFloat(item.qty)   || 0;
-    const price = parseFloat(item.price) || 0;
-    const tax   = parseFloat(item.tax)   || 0;
-    const sub   = qty * price;
-    const txAmt = sub * (tax / 100);
-    const total = sub + txAmt;
+    const d   = getFormData();
+    const cur = d.currency;
+    const c   = CURRENCIES[cur] || CURRENCIES.USD;
 
-    const taxLabel = tax > 0 ? `<br><small style="color:#8892AA;font-size:11px">Tax ${tax}%</small>` : '';
+    const logoHTML = logoDataURL
+      ? `<img src="${logoDataURL}" alt="Logo" style="max-height:80px;max-width:180px;object-fit:contain;" />`
+      : '';
 
-    return `
+    const itemRows = d.items.map(item => `
       <tr>
-        <td class="desc-cell">${nl2br(item.description) || '<em style="opacity:.4">—</em>'}${taxLabel}</td>
-        <td>${qty || '—'}</td>
-        <td>${price ? formatCurrency(price, currency) : '—'}</td>
-        <td class="amount-cell">${total > 0 ? formatCurrency(total, currency) : '—'}</td>
-      </tr>
-    `;
-  }).join('');
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">${escHtml(item.desc)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:center;">${item.qty}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:right;">${fmt(item.price, cur)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:center;">${item.tax}%</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:right;">${fmt(item.amount, cur)}</td>
+      </tr>`).join('');
 
-  // --- Totals block ---
-  const showTax   = totals.taxTotal > 0;
-  const taxRowHTML = showTax
-    ? `<div class="inv-total-row"><span>Tax</span><span>${formatCurrency(totals.taxTotal, currency)}</span></div>`
-    : '';
+    container.innerHTML = `
+      <div id="invoice-document" style="
+        background:#fff;color:#1a1a1a;font-family:'Segoe UI',Arial,sans-serif;
+        max-width:780px;margin:0 auto;padding:48px 48px 56px;
+        box-shadow:0 4px 32px rgba(0,0,0,.10);border-radius:8px;min-height:900px;">
 
-  // --- Notes/payment block ---
-  const hasNotes   = notes || payment;
-  const notesHTML  = hasNotes ? `
-    <div class="inv-notes-section">
-      ${notes ? `
-        <div class="inv-notes-block">
-          <div class="inv-meta-label">Notes</div>
-          <div class="inv-notes-text">${nl2br(notes)}</div>
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;">
+          <div>
+            ${logoHTML}
+            <div style="font-size:22px;font-weight:700;margin-top:${logoDataURL ? '12px' : '0'}">${escHtml(d.bizName)}</div>
+            <div style="color:#666;font-size:13px;margin-top:4px;white-space:pre-line;">${escHtml(d.bizAddress)}</div>
+            ${d.bizEmail ? `<div style="color:#666;font-size:13px;">${escHtml(d.bizEmail)}</div>` : ''}
+            ${d.bizPhone ? `<div style="color:#666;font-size:13px;">${escHtml(d.bizPhone)}</div>` : ''}
+            ${d.bizTaxId ? `<div style="color:#666;font-size:12px;margin-top:2px;">Tax ID: ${escHtml(d.bizTaxId)}</div>` : ''}
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:32px;font-weight:800;letter-spacing:-1px;color:#1a1a1a;">INVOICE</div>
+            <div style="font-size:15px;font-weight:600;color:#555;margin-top:6px;">${escHtml(d.invoiceNum)}</div>
+            ${d.issueDate ? `<div style="font-size:13px;color:#888;margin-top:4px;">Issued: ${escHtml(d.issueDate)}</div>` : ''}
+            ${d.dueDate   ? `<div style="font-size:13px;color:#e05c2a;font-weight:600;margin-top:2px;">Due: ${escHtml(d.dueDate)}</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Bill To -->
+        <div style="background:#f8f9fa;border-radius:6px;padding:20px 24px;margin-bottom:36px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:8px;">Bill To</div>
+          <div style="font-size:16px;font-weight:700;">${escHtml(d.clientName)}</div>
+          ${d.clientAddress ? `<div style="color:#666;font-size:13px;margin-top:2px;white-space:pre-line;">${escHtml(d.clientAddress)}</div>` : ''}
+          ${d.clientEmail   ? `<div style="color:#666;font-size:13px;">${escHtml(d.clientEmail)}</div>` : ''}
+          ${d.clientPhone   ? `<div style="color:#666;font-size:13px;">${escHtml(d.clientPhone)}</div>` : ''}
+        </div>
+
+        <!-- Items table -->
+        <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+          <thead>
+            <tr style="background:#1a1a1a;color:#fff;">
+              <th style="padding:10px 12px;text-align:left;font-size:12px;font-weight:600;">Description</th>
+              <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:600;">Qty</th>
+              <th style="padding:10px 12px;text-align:right;font-size:12px;font-weight:600;">Unit Price</th>
+              <th style="padding:10px 12px;text-align:center;font-size:12px;font-weight:600;">Tax %</th>
+              <th style="padding:10px 12px;text-align:right;font-size:12px;font-weight:600;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>${itemRows || '<tr><td colspan="5" style="padding:16px;text-align:center;color:#aaa;">No items added</td></tr>'}</tbody>
+        </table>
+
+        <!-- Totals -->
+        <div style="display:flex;justify-content:flex-end;margin-bottom:36px;">
+          <div style="min-width:260px;">
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid #eee;">
+              <span style="color:#666;">Subtotal</span>
+              <span>${fmt(d.subtotal, cur)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid #eee;">
+              <span style="color:#666;">Tax</span>
+              <span>${fmt(d.taxTotal, cur)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:18px;font-weight:800;">
+              <span>Total Due</span>
+              <span style="color:#1a1a1a;">${fmt(d.total, cur)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes / bank info -->
+        ${d.notes || d.bankInfo ? `
+        <div style="border-top:1px solid #eee;padding-top:24px;">
+          ${d.notes    ? `<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:4px;">Notes</div><div style="font-size:13px;color:#555;white-space:pre-line;">${escHtml(d.notes)}</div></div>` : ''}
+          ${d.bankInfo ? `<div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:4px;">Payment Details</div><div style="font-size:13px;color:#555;white-space:pre-line;">${escHtml(d.bankInfo)}</div></div>` : ''}
         </div>` : ''}
-      ${payment ? `
-        <div class="inv-notes-block">
-          <div class="inv-meta-label">Payment Details</div>
-          <div class="inv-notes-text">${nl2br(payment)}</div>
-        </div>` : ''}
-    </div>
-  ` : '';
 
-  return `
-    <div class="inv-accent-bar"></div>
-    <div class="inv-body">
-
-      <!-- HEADER -->
-      <div class="inv-header">
-        <div class="inv-from-block">
-          ${logoHTML}
-          <div class="inv-from-info">
-            ${fromName    ? `<div class="inv-company-name">${esc(fromName)}</div>` : ''}
-            ${fromAddress ? `<div class="inv-company-addr">${nl2br(fromAddress)}</div>` : ''}
-            ${fromContactHTML}
-            ${fromTaxHTML}
-          </div>
+        <div style="margin-top:40px;text-align:center;font-size:11px;color:#ccc;">
+          Generated with InvoiceFlow · invoiceflow.app
         </div>
-        <div class="inv-title-block">
-          <div class="inv-title">INVOICE</div>
-          ${invNumber ? `<div class="inv-number">${esc(invNumber)}</div>` : ''}
-        </div>
-      </div>
+      </div>`;
+  }
 
-      <div class="inv-divider"></div>
+  function escHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
-      <!-- META ROW: Bill To + Dates -->
-      <div class="inv-meta-row">
-        <div class="inv-bill-to">
-          <div class="inv-meta-label">Bill To</div>
-          ${toName    ? `<div class="inv-client-name">${esc(toName)}</div>` : ''}
-          ${toAddress ? `<div class="inv-client-addr">${nl2br(toAddress)}</div>` : ''}
-          ${toContactHTML}
-        </div>
-        <div class="inv-dates">
-          ${issueDate ? `
-            <div class="inv-date-block">
-              <div class="inv-meta-label">Issue Date</div>
-              <div class="inv-date-val">${formatDate(issueDate)}</div>
-            </div>` : ''}
-          ${dueDate ? `
-            <div class="inv-date-block">
-              <div class="inv-meta-label">Due Date</div>
-              <div class="inv-date-val" style="color:#4F46E5;font-weight:700">${formatDate(dueDate)}</div>
-            </div>` : ''}
-        </div>
-      </div>
+  /* ── Logo upload ─────────────────────────────────────────── */
+  function initLogoUpload() {
+    const input  = $('input[type="file"][accept*="image"], #logo-upload, [data-field="logo"]');
+    const imgEl  = $('#logo-preview, .logo-img, img[alt="Logo"]');
+    const removeBtn = $('#remove-logo, .btn-remove-logo, [data-action="removeLogo"]');
+    const dropZone  = $('.logo-drop, .logo-upload-area, [data-drop="logo"]');
 
-      <!-- ITEMS TABLE -->
-      <table class="inv-table">
-        <thead>
-          <tr>
-            <th style="width:45%">Description</th>
-            <th style="width:10%;text-align:right">Qty</th>
-            <th style="width:18%;text-align:right">Rate</th>
-            <th style="width:18%;text-align:right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemRowsHTML || `<tr><td colspan="4" style="text-align:center;padding:28px;color:#8892AA;font-style:italic">Add items using the form</td></tr>`}
-        </tbody>
-      </table>
+    if (!input && !dropZone) return;
 
-      <!-- TOTALS -->
-      <div class="inv-totals-wrap">
-        <div class="inv-totals-table">
-          <div class="inv-total-row">
-            <span>Subtotal</span>
-            <span>${formatCurrency(totals.subtotal, currency)}</span>
-          </div>
-          ${taxRowHTML}
-          <div class="inv-grand-row">
-            <span>Total Due</span>
-            <span>${formatCurrency(totals.grand, currency)}</span>
-          </div>
-        </div>
-      </div>
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      if (file.size > 2 * 1024 * 1024) { alert('Logo must be under 2 MB'); return; }
+      const reader = new FileReader();
+      reader.onload = e => {
+        logoDataURL = e.target.result;
+        if (imgEl) { imgEl.src = logoDataURL; imgEl.style.display = ''; }
+        if (dropZone) dropZone.classList.add('has-logo');
+        updatePreview();
+      };
+      reader.readAsDataURL(file);
+    }
 
-    </div>
+    if (input) {
+      input.addEventListener('change', () => handleFile(input.files[0]));
+    }
+    if (dropZone) {
+      dropZone.addEventListener('click', () => input && input.click());
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        handleFile(e.dataTransfer.files[0]);
+      });
+    }
+    if (removeBtn) {
+      removeBtn.addEventListener('click', () => {
+        logoDataURL = null;
+        if (imgEl) { imgEl.src = ''; imgEl.style.display = 'none'; }
+        if (input) input.value = '';
+        if (dropZone) dropZone.classList.remove('has-logo');
+        updatePreview();
+      });
+    }
+  }
 
-    ${notesHTML}
+  /* ── Download PDF ────────────────────────────────────────── */
+  function downloadPDF() {
+    updatePreview(); // ensure preview is fresh
 
-    <div class="inv-footer">
-      <div class="inv-thank-you">Thank you for your business</div>
-    </div>
-  `;
-}
+    // Strategy 1: use html2canvas + jsPDF if available
+    if (typeof html2canvas !== 'undefined' && typeof window.jspdf !== 'undefined') {
+      const doc = $('#invoice-document');
+      if (!doc) return;
+      html2canvas(doc, { scale: 2, useCORS: true, backgroundColor: '#fff' }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const imgW = 210;
+        const imgH = (canvas.height * imgW) / canvas.width;
+        let posY = 0;
+        const pageH = 297;
+        while (posY < imgH) {
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, -posY, imgW, imgH);
+          posY += pageH;
+          if (posY < imgH) pdf.addPage();
+        }
+        const d      = getFormData();
+        const fname  = `Invoice-${d.invoiceNum || 'draft'}.pdf`;
+        pdf.save(fname);
+      });
+      return;
+    }
 
-/* ─────────────────────────────────────────────────────────── */
-/*  SAVE / LOAD DRAFT                                          */
-/* ─────────────────────────────────────────────────────────── */
+    // Strategy 2: load jsPDF + html2canvas dynamically
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', () => {
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', () => {
+        downloadPDF(); // retry after load
+      });
+    });
+  }
 
-function collectFormData() {
-  return {
-    fromName:      val('fromName'),
-    fromAddress:   val('fromAddress'),
-    fromEmail:     val('fromEmail'),
-    fromPhone:     val('fromPhone'),
-    fromTaxId:     val('fromTaxId'),
-    toName:        val('toName'),
-    to
+  function loadScript(src, cb) {
+    if (document.querySelector(`script[src="${src}"
+    
