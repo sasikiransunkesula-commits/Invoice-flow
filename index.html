@@ -1,383 +1,551 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InvoiceFlow — Create Professional Invoices Free</title>
-  <meta name="description" content="Generate beautiful professional invoices instantly. Download as PDF, print, and share — completely free. No signup required.">
-  <meta property="og:title" content="InvoiceFlow — Free Professional Invoice Generator">
-  <meta property="og:description" content="Create stunning invoices in seconds. Free forever, no signup needed.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <meta name="description" content="Generate beautiful professional invoices instantly. Download as PDF, print, and share — completely free. No signup required." />
+  <meta property="og:title" content="InvoiceFlow — Free Professional Invoice Generator" />
+  <meta property="og:description" content="Create stunning invoices in seconds. Free forever, no signup needed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <!-- NAV -->
-  <nav class="nav" id="nav">
-    <div class="container nav-inner">
-      <a href="index.html" class="logo">
-        <div class="logo-mark">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z" stroke="white" stroke-width="2"/><polyline points="13 2 13 9 20 9" stroke="white" stroke-width="2"/><line x1="8" y1="13" x2="16" y2="13" stroke="white" stroke-width="2"/><line x1="8" y1="17" x2="12" y2="17" stroke="white" stroke-width="2"/></svg>
-        </div>
-        <span class="logo-text">InvoiceFlow</span>
-      </a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How it works</a>
-        <a href="#testimonials">Reviews</a>
-        <a href="#faq">FAQ</a>
-      </div>
-      <div class="nav-actions">
-        <button class="btn btn-ghost icon-only" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
-          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-        </button>
-        <a href="generator.html" class="btn btn-primary">
-          Create Invoice Free
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-      <button class="nav-toggle" id="navToggle" onclick="toggleMobileNav()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-    <div class="nav-mobile" id="navMobile">
-      <a href="#features" onclick="toggleMobileNav()">Features</a>
-      <a href="#how-it-works" onclick="toggleMobileNav()">How it works</a>
-      <a href="#testimonials" onclick="toggleMobileNav()">Reviews</a>
-      <a href="#faq" onclick="toggleMobileNav()">FAQ</a>
-      <a href="generator.html" class="btn btn-primary">Create Invoice Free →</a>
-    </div>
-  </nav>
+    :root {
+      --bg:        #0a0a0f;
+      --bg2:       #0f0f18;
+      --bg3:       #13131e;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --text:      #f0f0f4;
+      --muted:     #888899;
+      --accent:    #6c63ff;
+      --accent2:   #4ade80;
+      --accent-glow: rgba(108,99,255,0.35);
+      --serif:     'Instrument Serif', Georgia, serif;
+      --sans:      'DM Sans', system-ui, sans-serif;
+    }
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg">
-      <div class="hero-blob blob-1"></div>
-      <div class="hero-blob blob-2"></div>
-      <div class="hero-blob blob-3"></div>
-      <div class="hero-grid-overlay"></div>
-    </div>
-    <div class="container hero-inner">
-      <div class="hero-content">
-        <div class="hero-badge animate-fade-up" style="--d:0s">
-          <span class="badge-pulse"></span>
-          Free forever &bull; No signup required &bull; Works offline
-        </div>
-        <h1 class="hero-title animate-fade-up" style="--d:0.1s">
-          Create Professional<br>
-          <span class="gradient-text">Invoices in Seconds</span>
-        </h1>
-        <p class="hero-subtitle animate-fade-up" style="--d:0.2s">
-          Generate beautiful professional invoices instantly.<br>Download as PDF, print, and share — completely free.
-        </p>
-        <div class="hero-actions animate-fade-up" style="--d:0.3s">
-          <a href="generator.html" class="btn btn-primary btn-lg">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-            Create Invoice Free
-          </a>
-          <a href="#how-it-works" class="btn btn-outline btn-lg">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
-            See How It Works
-          </a>
-        </div>
-        <div class="hero-social-proof animate-fade-up" style="--d:0.4s">
-          <div class="proof-avatars">
-            <span class="pa pa1">MK</span>
-            <span class="pa pa2">SR</span>
-            <span class="pa pa3">AL</span>
-            <span class="pa pa4">JD</span>
-          </div>
-          <div class="proof-text">
-            <span class="proof-stars">★★★★★</span>
-            Trusted by <strong>10,000+</strong> freelancers worldwide
-          </div>
-        </div>
-      </div>
+    html { scroll-behavior: smooth; }
 
-      <div class="hero-visual animate-fade-left" style="--d:0.3s">
-        <div class="mockup-glow"></div>
-        <div class="invoice-mockup">
-          <div class="mockup-chrome">
-            <div class="chrome-dots">
-              <span class="cd cd-r"></span>
-              <span class="cd cd-y"></span>
-              <span class="cd cd-g"></span>
-            </div>
-            <div class="chrome-url">invoiceflow.app/generator</div>
-            <div class="chrome-actions">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            </div>
-          </div>
-          <div class="mockup-invoice">
-            <div class="mi-top-bar"></div>
-            <div class="mi-header">
-              <div class="mi-brand">
-                <div class="mi-logo-box">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" fill="#4F46E5" opacity="0.2"/><path d="M8 12h8M8 8h5M8 16h3" stroke="#4F46E5" stroke-width="2" stroke-linecap="round"/></svg>
-                </div>
-                <div>
-                  <div class="mi-company-name">Acme Studio</div>
-                  <div class="mi-company-sub">acme@studio.com</div>
-                </div>
-              </div>
-              <div class="mi-inv-meta">
-                <div class="mi-inv-title">INVOICE</div>
-                <div class="mi-inv-num">#INV-2026-0042</div>
-                <div class="mi-inv-due">Due: Jun 15, 2026</div>
-              </div>
-            </div>
-            <div class="mi-divider"></div>
-            <div class="mi-bill-row">
-              <div class="mi-bill-to">
-                <div class="mi-section-label">BILL TO</div>
-                <div class="mi-client-name">Kiran Design Co.</div>
-                <div class="mi-client-sub">Mumbai, India</div>
-              </div>
-              <div class="mi-bill-status">
-                <div class="mi-status-badge">PENDING</div>
-              </div>
-            </div>
-            <div class="mi-table-head">
-              <span>Description</span>
-              <span>Qty</span>
-              <span>Rate</span>
-              <span>Amount</span>
-            </div>
-            <div class="mi-rows">
-              <div class="mi-row">
-                <span>Brand Identity Design</span>
-                <span>1</span>
-                <span>$2,400</span>
-                <span>$2,400</span>
-              </div>
-              <div class="mi-row mi-row-alt">
-                <span>UI/UX Consultation</span>
-                <span>3</span>
-                <span>$350</span>
-                <span>$1,050</span>
-              </div>
-              <div class="mi-row">
-                <span>Asset Delivery</span>
-                <span>1</span>
-                <span>$250</span>
-                <span>$250</span>
-              </div>
-            </div>
-            <div class="mi-totals">
-              <div class="mi-total-line"><span>Subtotal</span><span>$3,700.00</span></div>
-              <div class="mi-total-line"><span>Tax (18%)</span><span>$666.00</span></div>
-              <div class="mi-grand-line"><span>Total Due</span><span>$4,366.00</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="float-badge badge-pdf">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          PDF Ready
-        </div>
-        <div class="float-badge badge-live">
-          <span class="live-dot"></span>
-          Live Preview
-        </div>
-        <div class="float-badge badge-secure">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          100% Private
-        </div>
-      </div>
-    </div>
-  </section>
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
-  <!-- LOGOS STRIP -->
-  <section class="logos-strip">
-    <div class="container">
-      <p class="logos-label">Used by freelancers, agencies, and creators at</p>
-      <div class="logos-row">
-        <span class="logo-pill">Designers</span>
-        <span class="logo-pill">Developers</span>
-        <span class="logo-pill">Agencies</span>
-        <span class="logo-pill">Consultants</span>
-        <span class="logo-pill">Photographers</span>
-        <span class="logo-pill">Writers</span>
-        <span class="logo-pill">Marketers</span>
-      </div>
-    </div>
-  </section>
+    /* ── Noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  <!-- FEATURES -->
-  <section class="section" id="features">
-    <div class="container">
-      <div class="section-header reveal">
-        <div class="section-tag">Everything you need</div>
-        <h2 class="section-title">Built for modern<br>professionals</h2>
-        <p class="section-sub">No accounts, no subscriptions, no complexity — just a powerful invoicing tool that gets out of your way.</p>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card reveal" style="--delay:0">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
-          <h3>Free Forever</h3>
-          <p>No subscriptions, no paywalls, no hidden fees. Every feature is free from day one. Always.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:1">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </div>
-          <h3>PDF Download</h3>
-          <p>Export pixel-perfect PDFs directly from your browser. Professional quality, every time.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:2">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
-          </div>
-          <h3>Live Preview</h3>
-          <p>Watch your invoice update in real time as you type. No guesswork — what you see is what you get.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:3">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-          </div>
-          <h3>Instant Calculations</h3>
-          <p>Subtotals, taxes, and totals update automatically. Per-item tax rates supported.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:4">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
-          </div>
-          <h3>Multi-Currency</h3>
-          <p>Invoice in USD, EUR, GBP, INR, AED, and CAD with correct formatting per locale.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:5">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-          </div>
-          <h3>Mobile Responsive</h3>
-          <p>Create invoices on any device. Desktop, tablet, or phone — it all works beautifully.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:6">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-          <h3>No Account Needed</h3>
-          <p>Open the app and start invoicing. No email, no password, no verification. Just go.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:7">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <h3>100% Private</h3>
-          <p>Your data never leaves your browser. No server, no cloud, no tracking. Fully private.</p>
-        </div>
-        <div class="feature-card reveal" style="--delay:8">
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          </div>
-          <h3>Save Drafts</h3>
-          <p>Save your invoice to browser storage and return anytime. Your work is never lost.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    /* ── Layout ── */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    section { position: relative; z-index: 1; }
 
-  <!-- HOW IT WORKS -->
-  <section class="section section-tinted" id="how-it-works">
-    <div class="container">
-      <div class="section-header reveal">
-        <div class="section-tag">Simple process</div>
-        <h2 class="section-title">From zero to invoice<br>in three steps</h2>
-      </div>
-      <div class="steps-container">
-        <div class="step-card reveal" style="--delay:0">
-          <div class="step-num">01</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </div>
-          <h3>Fill Your Details</h3>
-          <p>Enter your business info, client details, and line items. Upload your logo for a branded invoice.</p>
-          <div class="step-connector"></div>
-        </div>
-        <div class="step-card reveal" style="--delay:1">
-          <div class="step-num">02</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          </div>
-          <h3>Preview Live</h3>
-          <p>Your invoice renders in real time as you type. Adjust until every detail is perfect.</p>
-          <div class="step-connector"></div>
-        </div>
-        <div class="step-card reveal" style="--delay:2">
-          <div class="step-num">03</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </div>
-          <h3>Download & Send</h3>
-          <p>Export as a polished PDF or print directly. Share with your client and get paid faster.</p>
-        </div>
-      </div>
-      <div class="steps-cta reveal">
-        <a href="generator.html" class="btn btn-primary btn-lg">Start for Free — No Signup →</a>
-      </div>
-    </div>
-  </section>
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 24px;
+      background: rgba(10,10,15,0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1120px; margin: 0 auto;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 21px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 500 !important;
+      font-size: 13.5px !important;
+      transition: background .2s, box-shadow .2s !important;
+    }
+    .nav-cta:hover { background: #7c74ff !important; box-shadow: 0 0 20px var(--accent-glow) !important; color: #fff !important; }
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--text); margin: 5px 0; border-radius: 2px; transition: all .3s; }
+    .mobile-menu { display: none; }
 
-  <!-- TESTIMONIALS -->
-  <section class="section" id="testimonials">
-    <div class="container">
-      <div class="section-header reveal">
-        <div class="section-tag">Social proof</div>
-        <h2 class="section-title">Loved by freelancers<br>worldwide</h2>
-      </div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card reveal" style="--delay:0">
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">"Finally a free invoice tool that doesn't look amateur. The PDF export quality is stunning — my clients always comment on how polished my invoices look."</p>
-          <div class="t-author">
-            <div class="t-avatar ta-1">SR</div>
-            <div class="t-info">
-              <div class="t-name">Sophia Rajan</div>
-              <div class="t-role">UI Designer · Mumbai</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card reveal featured-t" style="--delay:1">
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">"I used to spend 45 minutes building invoices in Google Docs. Now it takes two minutes. The multi-currency support is a lifesaver for my international clients in Europe and the US."</p>
-          <div class="t-author">
-            <div class="t-avatar ta-2">MK</div>
-            <div class="t-info">
-              <div class="t-name">Marcus Klein</div>
-              <div class="t-role">Freelance Developer · Berlin</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card reveal" style="--delay:2">
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">"Our agency sends 60+ invoices a month. InvoiceFlow cut our billing time in half. No logins, no subscriptions — just open and invoice. Absolute game changer."</p>
-          <div class="t-author">
-            <div class="t-avatar ta-3">AL</div>
-            <div class="t-info">
-              <div class="t-name">Aisha Lopes</div>
-              <div class="t-role">Agency Director · Dubai</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    /* ── HERO ── */
+    .hero {
+      padding: 152px 24px 100px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 900px; height: 600px;
+      background: radial-gradient(ellipse at center, rgba(108,99,255,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.25);
+      color: #a8a2ff;
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+      animation: fadeUp .6s ease both;
+    }
+    .hero-eyebrow::before { content: ''; width: 6px; height: 6px; background: #6c63ff; border-radius: 50%; display: inline-block; }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(44px, 7vw, 82px);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      max-width: 820px;
+      margin: 0 auto 24px;
+      animation: fadeUp .6s .1s ease both;
+    }
+    .hero h1 em {
+      font-style: italic;
+      background: linear-gradient(135deg, #a8a2ff 0%, #6c63ff 50%, #4ade80 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      font-weight: 300;
+      line-height: 1.65;
+      animation: fadeUp .6s .2s ease both;
+    }
+    .hero-actions {
+      display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+      animation: fadeUp .6s .3s ease both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      transition: background .2s, box-shadow .25s, transform .15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 0 0 1px rgba(108,99,255,0.4);
+    }
+    .btn-primary:hover {
+      background: #7c74ff;
+      box-shadow: 0 4px 32px rgba(108,99,255,0.45), 0 1px 2px rgba(0,0,0,.3);
+      transform: translateY(-1px);
+    }
+    .btn-primary svg { transition: transform .2s; }
+    .btn-primary:hover svg { transform: translateX(3px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 400;
+      border: 1px solid var(--border2);
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
 
-  <!-- FAQ -->
-  <section class="section section-tinted" id="faq">
-    <div class="container">
-      <div class="section-header reveal">
-        <div class="section-tag">Questions</div>
-        <h2 class="section-title">Everything you<br>need to know</h2>
-      </div>
-      <div class="faq-list reveal">
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            Is InvoiceFlow really free?
-            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="faq-a
+    /* ── TRUST BADGES ── */
+    .trust-strip {
+      padding: 20px 24px 60px;
+      text-align: center;
+      animation: fadeUp .6s .45s ease both;
+    }
+    .trust-badges {
+      display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .trust-badge {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+    .trust-badge svg { color: var(--accent2); flex-shrink: 0; }
+    .trust-divider { width: 1px; height: 14px; background: var(--border2); }
+    .trust-avatars {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      color: var(--muted); font-size: 13px;
+    }
+    .avatar-stack { display: flex; }
+    .avatar-stack span {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 600; color: #fff;
+      margin-left: -8px;
+    }
+    .avatar-stack span:first-child { margin-left: 0; }
+
+    /* ── HERO VISUAL / INVOICE MOCKUP ── */
+    .hero-visual {
+      max-width: 860px;
+      margin: 0 auto 100px;
+      position: relative;
+      animation: fadeUp .7s .55s ease both;
+    }
+    .hero-visual-inner {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px var(--border);
+    }
+    .mockup-bar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .mockup-dots { display: flex; gap: 6px; }
+    .mockup-dots span { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dots span:nth-child(1) { background: #ff5f57; }
+    .mockup-dots span:nth-child(2) { background: #febc2e; }
+    .mockup-dots span:nth-child(3) { background: #28c840; }
+    .mockup-url {
+      flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px;
+      padding: 5px 12px; font-size: 12px; color: var(--muted);
+      text-align: center; border: 1px solid var(--border);
+    }
+    .mockup-body {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+    .invoice-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 28px;
+      color: #1a1a1a;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .inv-logo { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+    .inv-logo-sub { font-size: 10px; color: #888; margin-top: 2px; }
+    .inv-title { font-size: 22px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
+    .inv-num { font-size: 11px; color: #666; margin-top: 3px; }
+    .inv-due { font-size: 11px; color: #e05c2a; font-weight: 600; margin-top: 2px; }
+    .inv-bill { background: #f8f9fa; border-radius: 6px; padding: 12px; margin-bottom: 16px; }
+    .inv-bill-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; margin-bottom: 4px; font-weight: 600; }
+    .inv-bill-name { font-size: 13px; font-weight: 700; }
+    .inv-bill-sub { font-size: 11px; color: #777; }
+    .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 11px; }
+    .inv-table th { text-align: left; color: #aaa; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: .8px; border-bottom: 1px solid #eee; padding: 4px 0 6px; }
+    .inv-table td { padding: 6px 0; border-bottom: 1px solid #f5f5f5; color: #333; }
+    .inv-table td:last-child, .inv-table th:last-child { text-align: right; }
+    .inv-totals { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .inv-total-row { display: flex; gap: 40px; font-size: 11px; color: #666; }
+    .inv-total-grand { font-size: 15px; font-weight: 800; color: #1a1a1a; margin-top: 4px; }
+    .inv-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      color: #166534; padding: 3px 8px; border-radius: 20px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 12px;
+    }
+    .inv-badge::before { content: ''; width: 5px; height: 5px; background: #22c55e; border-radius: 50%; }
+    .mockup-sidebar {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sidebar-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .sidebar-card-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; font-weight: 500; margin-bottom: 10px; }
+    .sidebar-stat { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -1px; }
+    .sidebar-stat-sub { font-size: 12px; color: var(--accent2); margin-top: 2px; }
+    .sidebar-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+    .sidebar-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.2);
+      color: #a8a2ff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .pill.green { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.2); color: #4ade80; }
+
+    /* ── LOGOS / USED BY ── */
+    .logos-section {
+      padding: 0 24px 80px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .logos-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; margin-bottom: 28px; }
+    .logos-row {
+      display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;
+    }
+    .logo-chip {
+      font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.03em;
+      transition: color .2s;
+    }
+    .logo-chip:hover { color: rgba(255,255,255,0.5); }
+
+    /* ── FEATURES ── */
+    .features-section { padding: 100px 24px; }
+    .section-eyebrow {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--accent);
+      margin-bottom: 14px;
+      display: block;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(32px, 4.5vw, 52px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      max-width: 540px;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 480px;
+      font-weight: 300;
+      line-height: 1.65;
+      margin-bottom: 60px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .feature-card {
+      background: var(--bg2);
+      padding: 32px 28px;
+      transition: background .2s;
+    }
+    .feature-card:hover { background: var(--bg3); }
+    .feature-icon {
+      width: 40px; height: 40px;
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+      color: var(--accent);
+    }
+    .feature-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.01em; }
+    .feature-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 80px 24px 100px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 60px;
+    }
+    .step-card {
+      background: var(--bg2);
+      padding: 40px 32px;
+      position: relative;
+    }
+    .step-num {
+      font-family: var(--serif);
+      font-size: 72px;
+      line-height: 1;
+      font-weight: 400;
+      color: rgba(108,99,255,0.12);
+      letter-spacing: -3px;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .step-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+    .step-connector {
+      position: absolute; top: 52px; right: -1px;
+      width: 20px; height: 2px;
+      background: var(--accent);
+      opacity: 0.3;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section { padding: 100px 24px; }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 60px;
+    }
+    .testimonial-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color .2s, transform .2s;
+    }
+    .testimonial-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+    .stars { color: #f59e0b; font-size: 13px; letter-spacing: 2px; margin-bottom: 16px; }
+    .testimonial-text { font-size: 14px; color: #c0c0cc; line-height: 1.7; font-weight: 300; font-style: italic; margin-bottom: 20px; }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .author-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .author-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .author-role { font-size: 12px; color: var(--muted); }
+
+    /* ── FAQ ── */
+    .faq-section { padding: 80px 24px 100px; border-top: 1px solid var(--border); }
+    .faq-grid {
+      max-width: 720px;
+      margin: 60px auto 0;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 0;
+    }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 500;
+      font-family: var(--sans);
+      text-align: left;
+      gap: 16px;
+      transition: color .2s;
+    }
+    .faq-question:hover { color: #fff; }
+    .faq-icon {
+      width: 20px; height: 20px;
+      border: 1px solid var(--border2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: transform .3s, background .2s, border-color .2s;
+      color: var(--muted);
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.3); color: var(--accent); }
+    .faq-answer {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .35s ease, padding .3s ease;
+      padding: 0;
+    }
+    .faq-item.open .faq-answer { max-height: 400px; padding-bottom: 20px; }
+
+    /* ── CTA BANNER ── */
+    .cta-section {
+      padding: 80px 24px 100px;
+    }
+    .cta-inner {
+      background: linear-gradient(135deg, rgba(108,99,255,0.15) 0%, rgba(74,222,128,0.08) 100%);
+      border: 1px solid rgba(108,99,255,0.25);
+      border-radius: 20px;
+      padding: 72px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-inner::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(108,99,255,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-inner h2 {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4vw, 50px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .cta-inner h2 em { font-style: italic; color: #a8a2ff; }
+    .cta-inner p { font-size: 16px; color: var(--muted); margin-bottom: 36px; font-weight: 300; position: relative; }
+    .cta-actions { display: flex; align-items: c
+          
