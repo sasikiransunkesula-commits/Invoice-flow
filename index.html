@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvoiceFlow — Create Professional Invoices Free</title>
+  <meta name="description" content="Generate beautiful professional invoices instantly. Download as PDF, print, and share — completely free. No signup required.">
+  <meta property="og:title" content="InvoiceFlow — Free Professional Invoice Generator">
+  <meta property="og:description" content="Create stunning invoices in seconds. Free forever, no signup needed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z" stroke="white" stroke-width="2"/><polyline points="13 2 13 9 20 9" stroke="white" stroke-width="2"/><line x1="8" y1="13" x2="16" y2="13" stroke="white" stroke-width="2"/><line x1="8" y1="17" x2="12" y2="17" stroke="white" stroke-width="2"/></svg>
+        </div>
+        <span class="logo-text">InvoiceFlow</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#testimonials">Reviews</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn btn-ghost icon-only" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+        <a href="generator.html" class="btn btn-primary">
+          Create Invoice Free
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <button class="nav-toggle" id="navToggle" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="#features" onclick="toggleMobileNav()">Features</a>
+      <a href="#how-it-works" onclick="toggleMobileNav()">How it works</a>
+      <a href="#testimonials" onclick="toggleMobileNav()">Reviews</a>
+      <a href="#faq" onclick="toggleMobileNav()">FAQ</a>
+      <a href="generator.html" class="btn btn-primary">Create Invoice Free →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-blob blob-1"></div>
+      <div class="hero-blob blob-2"></div>
+      <div class="hero-blob blob-3"></div>
+      <div class="hero-grid-overlay"></div>
+    </div>
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge animate-fade-up" style="--d:0s">
+          <span class="badge-pulse"></span>
+          Free forever &bull; No signup required &bull; Works offline
+        </div>
+        <h1 class="hero-title animate-fade-up" style="--d:0.1s">
+          Create Professional<br>
+          <span class="gradient-text">Invoices in Seconds</span>
+        </h1>
+        <p class="hero-subtitle animate-fade-up" style="--d:0.2s">
+          Generate beautiful professional invoices instantly.<br>Download as PDF, print, and share — completely free.
+        </p>
+        <div class="hero-actions animate-fade-up" style="--d:0.3s">
+          <a href="generator.html" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            Create Invoice Free
+          </a>
+          <a href="#how-it-works" class="btn btn-outline btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
+            See How It Works
+          </a>
+        </div>
+        <div class="hero-social-proof animate-fade-up" style="--d:0.4s">
+          <div class="proof-avatars">
+            <span class="pa pa1">MK</span>
+            <span class="pa pa2">SR</span>
+            <span class="pa pa3">AL</span>
+            <span class="pa pa4">JD</span>
+          </div>
+          <div class="proof-text">
+            <span class="proof-stars">★★★★★</span>
+            Trusted by <strong>10,000+</strong> freelancers worldwide
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual animate-fade-left" style="--d:0.3s">
+        <div class="mockup-glow"></div>
+        <div class="invoice-mockup">
+          <div class="mockup-chrome">
+            <div class="chrome-dots">
+              <span class="cd cd-r"></span>
+              <span class="cd cd-y"></span>
+              <span class="cd cd-g"></span>
+            </div>
+            <div class="chrome-url">invoiceflow.app/generator</div>
+            <div class="chrome-actions">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+          </div>
+          <div class="mockup-invoice">
+            <div class="mi-top-bar"></div>
+            <div class="mi-header">
+              <div class="mi-brand">
+                <div class="mi-logo-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" fill="#4F46E5" opacity="0.2"/><path d="M8 12h8M8 8h5M8 16h3" stroke="#4F46E5" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <div>
+                  <div class="mi-company-name">Acme Studio</div>
+                  <div class="mi-company-sub">acme@studio.com</div>
+                </div>
+              </div>
+              <div class="mi-inv-meta">
+                <div class="mi-inv-title">INVOICE</div>
+                <div class="mi-inv-num">#INV-2026-0042</div>
+                <div class="mi-inv-due">Due: Jun 15, 2026</div>
+              </div>
+            </div>
+            <div class="mi-divider"></div>
+            <div class="mi-bill-row">
+              <div class="mi-bill-to">
+                <div class="mi-section-label">BILL TO</div>
+                <div class="mi-client-name">Kiran Design Co.</div>
+                <div class="mi-client-sub">Mumbai, India</div>
+              </div>
+              <div class="mi-bill-status">
+                <div class="mi-status-badge">PENDING</div>
+              </div>
+            </div>
+            <div class="mi-table-head">
+              <span>Description</span>
+              <span>Qty</span>
+              <span>Rate</span>
+              <span>Amount</span>
+            </div>
+            <div class="mi-rows">
+              <div class="mi-row">
+                <span>Brand Identity Design</span>
+                <span>1</span>
+                <span>$2,400</span>
+                <span>$2,400</span>
+              </div>
+              <div class="mi-row mi-row-alt">
+                <span>UI/UX Consultation</span>
+                <span>3</span>
+                <span>$350</span>
+                <span>$1,050</span>
+              </div>
+              <div class="mi-row">
+                <span>Asset Delivery</span>
+                <span>1</span>
+                <span>$250</span>
+                <span>$250</span>
+              </div>
+            </div>
+            <div class="mi-totals">
+              <div class="mi-total-line"><span>Subtotal</span><span>$3,700.00</span></div>
+              <div class="mi-total-line"><span>Tax (18%)</span><span>$666.00</span></div>
+              <div class="mi-grand-line"><span>Total Due</span><span>$4,366.00</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="float-badge badge-pdf">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF Ready
+        </div>
+        <div class="float-badge badge-live">
+          <span class="live-dot"></span>
+          Live Preview
+        </div>
+        <div class="float-badge badge-secure">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          100% Private
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGOS STRIP -->
+  <section class="logos-strip">
+    <div class="container">
+      <p class="logos-label">Used by freelancers, agencies, and creators at</p>
+      <div class="logos-row">
+        <span class="logo-pill">Designers</span>
+        <span class="logo-pill">Developers</span>
+        <span class="logo-pill">Agencies</span>
+        <span class="logo-pill">Consultants</span>
+        <span class="logo-pill">Photographers</span>
+        <span class="logo-pill">Writers</span>
+        <span class="logo-pill">Marketers</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">Everything you need</div>
+        <h2 class="section-title">Built for modern<br>professionals</h2>
+        <p class="section-sub">No accounts, no subscriptions, no complexity — just a powerful invoicing tool that gets out of your way.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal" style="--delay:0">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <h3>Free Forever</h3>
+          <p>No subscriptions, no paywalls, no hidden fees. Every feature is free from day one. Always.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:1">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3>PDF Download</h3>
+          <p>Export pixel-perfect PDFs directly from your browser. Professional quality, every time.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:2">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+          </div>
+          <h3>Live Preview</h3>
+          <p>Watch your invoice update in real time as you type. No guesswork — what you see is what you get.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:3">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <h3>Instant Calculations</h3>
+          <p>Subtotals, taxes, and totals update automatically. Per-item tax rates supported.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:4">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <h3>Multi-Currency</h3>
+          <p>Invoice in USD, EUR, GBP, INR, AED, and CAD with correct formatting per locale.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:5">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h3>Mobile Responsive</h3>
+          <p>Create invoices on any device. Desktop, tablet, or phone — it all works beautifully.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:6">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h3>No Account Needed</h3>
+          <p>Open the app and start invoicing. No email, no password, no verification. Just go.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:7">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>100% Private</h3>
+          <p>Your data never leaves your browser. No server, no cloud, no tracking. Fully private.</p>
+        </div>
+        <div class="feature-card reveal" style="--delay:8">
+          <div class="feat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </div>
+          <h3>Save Drafts</h3>
+          <p>Save your invoice to browser storage and return anytime. Your work is never lost.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section section-tinted" id="how-it-works">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">Simple process</div>
+        <h2 class="section-title">From zero to invoice<br>in three steps</h2>
+      </div>
+      <div class="steps-container">
+        <div class="step-card reveal" style="--delay:0">
+          <div class="step-num">01</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <h3>Fill Your Details</h3>
+          <p>Enter your business info, client details, and line items. Upload your logo for a branded invoice.</p>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-card reveal" style="--delay:1">
+          <div class="step-num">02</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Preview Live</h3>
+          <p>Your invoice renders in real time as you type. Adjust until every detail is perfect.</p>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step-card reveal" style="--delay:2">
+          <div class="step-num">03</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3>Download & Send</h3>
+          <p>Export as a polished PDF or print directly. Share with your client and get paid faster.</p>
+        </div>
+      </div>
+      <div class="steps-cta reveal">
+        <a href="generator.html" class="btn btn-primary btn-lg">Start for Free — No Signup →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">Social proof</div>
+        <h2 class="section-title">Loved by freelancers<br>worldwide</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal" style="--delay:0">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">"Finally a free invoice tool that doesn't look amateur. The PDF export quality is stunning — my clients always comment on how polished my invoices look."</p>
+          <div class="t-author">
+            <div class="t-avatar ta-1">SR</div>
+            <div class="t-info">
+              <div class="t-name">Sophia Rajan</div>
+              <div class="t-role">UI Designer · Mumbai</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal featured-t" style="--delay:1">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">"I used to spend 45 minutes building invoices in Google Docs. Now it takes two minutes. The multi-currency support is a lifesaver for my international clients in Europe and the US."</p>
+          <div class="t-author">
+            <div class="t-avatar ta-2">MK</div>
+            <div class="t-info">
+              <div class="t-name">Marcus Klein</div>
+              <div class="t-role">Freelance Developer · Berlin</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal" style="--delay:2">
+          <div class="t-stars">★★★★★</div>
+          <p class="t-text">"Our agency sends 60+ invoices a month. InvoiceFlow cut our billing time in half. No logins, no subscriptions — just open and invoice. Absolute game changer."</p>
+          <div class="t-author">
+            <div class="t-avatar ta-3">AL</div>
+            <div class="t-info">
+              <div class="t-name">Aisha Lopes</div>
+              <div class="t-role">Agency Director · Dubai</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section-tinted" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">Questions</div>
+        <h2 class="section-title">Everything you<br>need to know</h2>
+      </div>
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Is InvoiceFlow really free?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-a
