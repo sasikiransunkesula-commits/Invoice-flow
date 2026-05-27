@@ -1,300 +1,579 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create a professional invoice in seconds. Free PDF download, no signup required." />
   <title>Invoice Generator — InvoiceFlow</title>
-  <meta name="description" content="Create a professional invoice in seconds. Free PDF download, no signup required.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET & TOKENS ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #0f0f11;
+      --ink-mid:    #3d3d46;
+      --ink-soft:   #7a7a8c;
+      --ink-ghost:  #b8b8cc;
+      --surface:    #f5f4f1;
+      --panel:      #ffffff;
+      --border:     #e4e2dd;
+      --border-sub: #eeecе8;
+      --accent:     #1a1a2e;
+      --gold:       #c9a84c;
+      --gold-pale:  #f7f0e0;
+      --green:      #1e7a5c;
+      --green-pale: #e6f5ef;
+      --danger:     #c0392b;
+      --r:          8px;
+      --r-lg:       16px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:  0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+      --shadow-lg:  0 12px 48px rgba(0,0,0,.12), 0 4px 16px rgba(0,0,0,.06);
+      --nav-h:      60px;
+      --form-w:     480px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ───────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--nav-h);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .nav-brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -.3px;
+    }
+    .nav-brand span { color: var(--gold); }
+
+    .nav-actions {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ─── BUTTONS ───────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      border: none; border-radius: var(--r); cursor: pointer;
+      padding: 8px 14px; transition: all .15s ease;
+      white-space: nowrap; text-decoration: none;
+    }
+    .btn svg { flex-shrink: 0; }
+
+    .btn-ghost {
+      background: transparent; color: var(--ink-mid);
+    }
+    .btn-ghost:hover { background: var(--surface); color: var(--ink); }
+
+    .btn-outline {
+      background: var(--panel); color: var(--ink-mid);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    }
+    .btn-outline:hover { border-color: var(--ink-ghost); color: var(--ink); }
+
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 2px 8px rgba(26,26,46,.25);
+    }
+    .btn-primary:hover { background: #252545; box-shadow: 0 4px 16px rgba(26,26,46,.3); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-gold {
+      background: var(--gold); color: #fff;
+      box-shadow: 0 2px 8px rgba(201,168,76,.35);
+    }
+    .btn-gold:hover { background: #b8963e; box-shadow: 0 4px 16px rgba(201,168,76,.4); transform: translateY(-1px); }
+
+    .btn-danger-ghost {
+      background: transparent; color: var(--danger);
+      border: 1px solid transparent; padding: 4px 8px; font-size: 12px;
+    }
+    .btn-danger-ghost:hover { background: #fdf0ef; border-color: #f5c6c3; }
+
+    .btn-icon {
+      padding: 7px; border-radius: var(--r);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--ink-mid);
+    }
+    .btn-icon:hover { background: var(--border); color: var(--ink); }
+
+    /* ─── MOBILE TOGGLE ─────────────────────────────── */
+    .tab-toggle {
+      display: none;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      gap: 8px;
+      position: sticky; top: var(--nav-h); z-index: 90;
+    }
+    .tab-btn {
+      flex: 1; padding: 8px; border-radius: var(--r);
+      font-family: inherit; font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border); cursor: pointer;
+      background: var(--panel); color: var(--ink-mid);
+      transition: all .15s;
+    }
+    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ─── LAYOUT ────────────────────────────────────── */
+    .workspace {
+      display: grid;
+      grid-template-columns: var(--form-w) 1fr;
+      min-height: 100vh;
+      padding-top: var(--nav-h);
+    }
+
+    /* ─── LEFT PANEL ────────────────────────────────── */
+    .form-panel {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      height: calc(100vh - var(--nav-h));
+      position: sticky;
+      top: var(--nav-h);
+      display: flex; flex-direction: column;
+    }
+
+    .form-scroll { flex: 1; overflow-y: auto; padding: 28px 28px 0; }
+
+    .form-footer {
+      padding: 16px 28px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+      display: flex; gap: 8px;
+    }
+    .form-footer .btn { flex: 1; justify-content: center; }
+
+    /* section cards */
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .section-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: var(--gold-pale);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 12px; font-weight: 600; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--ink-soft);
+    }
+
+    .section-divider {
+      height: 1px; background: var(--border); margin-bottom: 24px;
+    }
+
+    /* ─── FIELDS ────────────────────────────────────── */
+    .field { margin-bottom: 14px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    label {
+      display: block;
+      font-size: 11.5px; font-weight: 500; color: var(--ink-soft);
+      margin-bottom: 5px;
+      letter-spacing: .02em;
+    }
+    label .opt {
+      font-weight: 400; color: var(--ink-ghost); font-size: 10.5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 9px 12px;
+      font-family: inherit; font-size: 13.5px; color: var(--ink);
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--ink-ghost); }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,.12);
+      background: #fff;
+    }
+
+    textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+    select { appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a8c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 34px;
+    }
+
+    /* ─── LOGO UPLOAD ───────────────────────────────── */
+    .logo-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: var(--surface);
+      position: relative;
+    }
+    .logo-upload-area:hover { border-color: var(--gold); background: var(--gold-pale); }
+    .logo-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+    .logo-upload-inner { pointer-events: none; }
+    .logo-upload-icon {
+      width: 36px; height: 36px;
+      background: var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 8px;
+      color: var(--ink-soft);
+    }
+    .logo-upload-text { font-size: 12.5px; color: var(--ink-soft); }
+    .logo-upload-text strong { display: block; color: var(--ink-mid); }
+    .logo-upload-hint { font-size: 11px; color: var(--ink-ghost); margin-top: 3px; }
+
+    .logo-preview-wrap {
+      display: none;
+      align-items: center; gap: 12px;
+      padding: 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+    }
+    .logo-preview-wrap.show { display: flex; }
+    #logoPreview { max-height: 44px; max-width: 120px; border-radius: 4px; object-fit: contain; }
+    .logo-remove-btn { margin-left: auto; }
+
+    /* ─── LINE ITEMS ────────────────────────────────── */
+    .items-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    .items-table th {
+      font-size: 10.5px; font-weight: 600; color: var(--ink-ghost);
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 0 4px 8px;
+      text-align: left;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .items-table th:last-child { text-align: right; }
+
+    .item-row td { padding: 6px 4px; vertical-align: middle; }
+    .item-row td:last-child { text-align: right; }
+
+    .item-row input {
+      padding: 7px 9px;
+      font-size: 13px;
+    }
+    .item-desc { width: 38%; }
+    .item-qty   { width: 12%; }
+    .item-rate  { width: 18%; }
+    .item-tax   { width: 14%; }
+    .item-amt   { width: 13%; font-weight: 500; font-size: 13px; color: var(--ink); }
+    .item-del   { width: 5%; }
+
+    .item-amount-cell {
+      text-align: right;
+      font-size: 13px; font-weight: 500;
+      color: var(--ink); white-space: nowrap;
+      padding-right: 4px;
+    }
+
+    .add-item-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 500; color: var(--gold);
+      background: var(--gold-pale);
+      border: 1.5px dashed #d4b470;
+      border-radius: var(--r);
+      padding: 9px 14px;
+      cursor: pointer; width: 100%;
+      justify-content: center;
+      transition: all .15s;
+    }
+    .add-item-btn:hover { background: #f0e6c8; border-color: var(--gold); }
+
+    /* ─── RIGHT PANEL ───────────────────────────────── */
+    .preview-panel {
+      background: var(--surface);
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    .preview-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .preview-label {
+      font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink-soft);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .preview-label::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .4; }
+    }
+
+    /* ─── INVOICE DOCUMENT ──────────────────────────── */
+    #invoicePreview {
+      background: #fff;
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,.04);
+      max-width: 780px;
+      margin: 0 auto;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .inv-header {
+      background: var(--accent);
+      padding: 36px 40px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 24px;
+    }
+
+    .inv-brand { flex: 1; }
+
+    .inv-logo {
+      max-height: 52px; max-width: 160px;
+      object-fit: contain; border-radius: 4px;
+      display: none;
+    }
+    .inv-logo.show { display: block; }
+
+    .inv-company-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px; color: #fff;
+      line-height: 1.2;
+    }
+    .inv-company-sub {
+      font-size: 12px; color: rgba(255,255,255,.55);
+      margin-top: 4px; line-height: 1.5;
+    }
+
+    .inv-badge {
+      text-align: right;
+    }
+    .inv-badge-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px; color: var(--gold);
+      letter-spacing: -1px; line-height: 1;
+    }
+    .inv-number {
+      font-size: 12px; color: rgba(255,255,255,.6);
+      margin-top: 6px;
+    }
+    .inv-number strong { color: rgba(255,255,255,.9); }
+
+    .inv-body { padding: 36px 40px; }
+
+    .inv-meta-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px; margin-bottom: 32px;
+    }
+
+    .inv-meta-block {}
+    .inv-meta-label {
+      font-size: 10px; font-weight: 600; color: var(--ink-ghost);
+      letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .inv-meta-value {
+      font-size: 13px; color: var(--ink); line-height: 1.5;
+    }
+    .inv-meta-value strong { display: block; font-weight: 600; }
+
+    .inv-dates-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 32px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+    }
+    .inv-date-item {}
+    .inv-date-label { font-size: 10.5px; color: var(--ink-soft); font-weight: 500; }
+    .inv-date-val { font-size: 14px; font-weight: 600; color: var(--ink); margin-top: 2px; }
+
+    /* items table in preview */
+    .inv-items { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; }
+
+    .inv-items thead tr {
+      background: var(--surface);
+    }
+    .inv-items th {
+      font-size: 10.5px; font-weight: 600; color: var(--ink-soft);
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    .inv-items th:not(:first-child) { text-align: right; }
+    .inv-items th:first-child { border-radius: var(--r) 0 0 var(--r); }
+    .inv-items th:last-child { border-radius: 0 var(--r) var(--r) 0; }
+
+    .inv-items tbody tr { border-bottom: 1px solid var(--border); }
+    .inv-items tbody tr:last-child { border-bottom: none; }
+    .inv-items td {
+      padding: 12px 14px; font-size: 13.5px; color: var(--ink);
+      vertical-align: top;
+    }
+    .inv-items td:not(:first-child) { text-align: right; }
+    .inv-items .td-desc { font-weight: 500; }
+    .inv-items .td-sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; font-weight: 400; }
+
+    .inv-totals {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 0;
+      margin-bottom: 28px;
+    }
+    .inv-total-row {
+      display: flex; justify-content: space-between;
+      width: 260px; padding: 7px 0;
+      font-size: 13.5px; color: var(--ink-mid);
+      border-bottom: 1px solid var(--border);
+    }
+    .inv-total-row:last-child { border-bottom: none; }
+    .inv-total-row.grand {
+      background: var(--accent);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: var(--r);
+      width: 260px;
+      margin-top: 8px;
+      font-weight: 600; font-size: 15px;
+    }
+    .inv-total-row.grand .t-label { color: rgba(255,255,255,.75); }
+    .inv-total-row.grand .t-value { color: var(--gold); font-family: 'DM Serif Display', serif; font-size: 18px; }
+
+    .inv-footer-note {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 16px 20px;
+      font-size: 12.5px; color: var(--ink-mid); line-height: 1.6;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .inv-footer-note strong { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); margin-bottom: 4px; }
+
+    .inv-footer-bar {
+      border-top: 1px solid var(--border);
+      padding: 16px 20px 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .inv-footer-brand {
+      font-size: 11px; color: var(--ink-ghost);
+    }
+    .inv-footer-brand span { color: var(--ink-soft); font-weight: 500; }
+
+    /* ─── PRINT ─────────────────────────────────────── */
+    @media print {
+      .nav, .form-panel, .preview-toolbar, .preview-panel > *:not(#invoicePreview),
+      .tab-toggle { display: none !important; }
+      body { background: #fff; }
+      .workspace { display: block; padding-top: 0; }
+      .preview-panel { padding: 0; background: #fff; }
+      #invoicePreview { box-shadow: none; border-radius: 0; max-width: 100%; }
+      .inv-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .inv-total-row.grand { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+
+    /* ─── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 1024px) {
+      :root { --form-w: 420px; }
+    }
+
+    @media (max-width: 768px) {
+      .workspace { grid-template-columns: 1fr; }
+      .form-panel {
+        position: static; height: auto;
+        border-right: none; border-bottom: 1px solid var(--border);
+      }
+      .tab-toggle { display: flex; }
+      .preview-panel { padding: 20px 16px; }
+      .form-panel[data-hidden="true"] { display: none; }
+      .preview-panel[data-hidden="true"] { display: none; }
+      .field-row, .field-row-3 { grid-template-columns: 1fr; }
+      .nav-actions .btn-outline { display: none; }
+    }
+
+    /* ─── UTILITY ───────────────────────────────────── */
+    .empty-placeholder { color: var(--ink-ghost); font-style: italic; }
+    .text-right { text-align: right; }
+    .mt-4 { margin-top: 4px; }
+    .font-mono { font-family: 'DM Mono', monospace; }
+  </style>
 </head>
-<body class="gen-page">
+<body>
 
-  <!-- GENERATOR NAV -->
-  <nav class="gen-nav">
-    <div class="gen-nav-inner">
-      <a href="index.html" class="logo gen-logo">
-        <div class="logo-mark logo-mark-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z" stroke="white" stroke-width="2"/><polyline points="13 2 13 9 20 9" stroke="white" stroke-width="2"/><line x1="8" y1="13" x2="16" y2="13" stroke="white" stroke-width="2"/></svg>
-        </div>
-        <span class="logo-text">InvoiceFlow</span>
-      </a>
-
-      <div class="gen-nav-center">
-        <span class="gen-nav-title">Invoice Generator</span>
-      </div>
-
-      <div class="gen-nav-actions">
-        <button class="btn btn-ghost btn-sm" onclick="saveDraft()" title="Save Draft">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          <span class="hide-xs">Save Draft</span>
-        </button>
-        <button class="btn btn-ghost btn-sm" onclick="resetForm()" title="Reset Form">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-          <span class="hide-xs">Reset</span>
-        </button>
-        <button class="btn btn-ghost btn-sm icon-only" onclick="toggleTheme()" title="Toggle theme">
-          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-        </button>
-        <button class="btn btn-outline btn-sm" onclick="printInvoice()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Print
-        </button>
-        <button class="btn btn-primary btn-sm" onclick="downloadPDF()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
-        </button>
-      </div>
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="index.html" class="nav-brand">Invoice<span>Flow</span></a>
+    <div class="nav-actions">
+      <button class="btn btn-outline" id="saveDraftBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+        Save Draft
+      </button>
+      <button class="btn btn-outline" id="resetBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Reset
+      </button>
+      <button class="btn btn-outline" id="printBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print
+      </button>
+      <button class="btn btn-gold" id="downloadBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PDF
+      </button>
     </div>
   </nav>
 
   <!-- MOBILE TABS -->
-  <div class="mobile-tab-bar">
-    <button class="mob-tab active" id="tabForm" onclick="switchTab('form')">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Edit
-    </button>
-    <button class="mob-tab" id="tabPreview" onclick="switchTab('preview')">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      Preview
-    </button>
-  </div>
-
-  <!-- MAIN LAYOUT -->
-  <div class="gen-layout">
-
-    <!-- FORM PANEL -->
-    <div class="gen-form-panel" id="genFormPanel">
-      <div class="form-scroll">
-
-        <!-- SECTION: YOUR BUSINESS -->
-        <div class="form-section">
-          <h3 class="fsec-title">
-            <div class="fsec-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-            </div>
-            Your Business
-          </h3>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Company / Your Name</label>
-              <input type="text" id="fromName" class="form-input" placeholder="Acme Studio" oninput="updatePreview()">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Logo <span class="form-optional">optional</span></label>
-            <div class="logo-upload" id="logoUpload" onclick="document.getElementById('logoFile').click()">
-              <img id="logoThumb" alt="Logo" style="display:none">
-              <div class="logo-upload-ph" id="logoPh">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <span>Click to upload logo</span>
-                <small>PNG, JPG, SVG — max 2MB</small>
-              </div>
-            </div>
-            <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
-            <button class="form-text-btn" id="removeLogoBtn" style="display:none" onclick="removeLogo()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Remove logo
-            </button>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Address</label>
-            <textarea id="fromAddress" class="form-input form-textarea" rows="3" placeholder="123 Studio Lane&#10;Mumbai 400001&#10;India" oninput="updatePreview()"></textarea>
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input type="email" id="fromEmail" class="form-input" placeholder="hello@acme.com" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Phone</label>
-              <input type="tel" id="fromPhone" class="form-input" placeholder="+91 98765 43210" oninput="updatePreview()">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">GST / VAT / Tax ID <span class="form-optional">optional</span></label>
-            <input type="text" id="fromTaxId" class="form-input" placeholder="GST: 27XXXXX1234X1ZX" oninput="updatePreview()">
-          </div>
-        </div>
-
-        <!-- SECTION: BILL TO -->
-        <div class="form-section">
-          <h3 class="fsec-title">
-            <div class="fsec-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
-            Bill To (Client)
-          </h3>
-
-          <div class="form-group">
-            <label class="form-label">Client / Company Name</label>
-            <input type="text" id="toName" class="form-input" placeholder="Kiran Design Co." oninput="updatePreview()">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Address</label>
-            <textarea id="toAddress" class="form-input form-textarea" rows="3" placeholder="456 Client Street&#10;Delhi 110001&#10;India" oninput="updatePreview()"></textarea>
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input type="email" id="toEmail" class="form-input" placeholder="client@company.com" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Phone</label>
-              <input type="tel" id="toPhone" class="form-input" placeholder="+91 99999 00000" oninput="updatePreview()">
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION: INVOICE DETAILS -->
-        <div class="form-section">
-          <h3 class="fsec-title">
-            <div class="fsec-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            Invoice Details
-          </h3>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Invoice Number</label>
-              <div class="input-addon">
-                <input type="text" id="invoiceNumber" class="form-input" placeholder="INV-2026-0001" oninput="updatePreview()">
-                <button class="input-addon-btn" onclick="generateInvoiceNumber()" title="Auto-generate number">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-                </button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Currency</label>
-              <select id="currency" class="form-input form-select" onchange="recalculate(); updatePreview()">
-                <option value="USD">$ USD — US Dollar</option>
-                <option value="EUR">€ EUR — Euro</option>
-                <option value="GBP">£ GBP — British Pound</option>
-                <option value="INR">₹ INR — Indian Rupee</option>
-                <option value="AED">AED — UAE Dirham</option>
-                <option value="CAD">CA$ CAD — Canadian Dollar</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label">Issue Date</label>
-              <input type="date" id="issueDate" class="form-input" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Due Date</label>
-              <input type="date" id="dueDate" class="form-input" oninput="updatePreview()">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Default Tax / VAT Rate (%) <span class="form-optional">applied to new items</span></label>
-            <input type="number" id="defaultTax" class="form-input" placeholder="0" min="0" max="100" step="0.1" value="0" oninput="updatePreview()">
-          </div>
-        </div>
-
-        <!-- SECTION: LINE ITEMS -->
-        <div class="form-section">
-          <h3 class="fsec-title">
-            <div class="fsec-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            </div>
-            Invoice Items
-          </h3>
-
-          <div class="items-col-head">
-            <span class="ic-desc">Description</span>
-            <span class="ic-qty">Qty</span>
-            <span class="ic-price">Unit Price</span>
-            <span class="ic-tax">Tax %</span>
-            <span class="ic-amt">Amount</span>
-            <span class="ic-del"></span>
-          </div>
-
-          <div id="itemsList" class="items-list">
-            <!-- JS renders items here -->
-          </div>
-
-          <button class="add-item-btn" onclick="addItem()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Line Item
-          </button>
-        </div>
-
-        <!-- SECTION: NOTES & TERMS -->
-        <div class="form-section">
-          <h3 class="fsec-title">
-            <div class="fsec-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            </div>
-            Notes & Terms
-          </h3>
-
-          <div class="form-group">
-            <label class="form-label">Notes <span class="form-optional">optional</span></label>
-            <textarea id="invoiceNotes" class="form-input form-textarea" rows="3" placeholder="Thank you for your business! Payment is due within 30 days." oninput="updatePreview()"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Payment Details / Bank Info <span class="form-optional">optional</span></label>
-            <textarea id="paymentTerms" class="form-input form-textarea" rows="2" placeholder="Bank: HDFC Bank | A/C: XXXX XXXX | IFSC: HDFC0001234" oninput="updatePreview()"></textarea>
-          </div>
-        </div>
-
-        <!-- MOBILE BOTTOM ACTIONS -->
-        <div class="form-mobile-actions">
-          <button class="btn btn-outline" onclick="saveDraft()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save Draft
-          </button>
-          <button class="btn btn-primary" onclick="downloadPDF()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download PDF
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- PREVIEW PANEL -->
-    <div class="gen-preview-panel" id="genPreviewPanel">
-      <div class="preview-toolbar">
-        <span class="preview-label">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          Live Preview
-        </span>
-        <span class="preview-hint">Updates as you type</span>
-      </div>
-      <div class="preview-scroll">
-        <div class="preview-paper-wrap">
-          <div id="invoicePreview" class="invoice-doc">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- PRINT AREA - Only visible during print -->
-  <div id="printArea" class="print-area"></div>
-
-  <!-- TOAST NOTIFICATION -->
-  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+  <div class="tab-toggle" id="tabToggle">
+    <button class="tab-btn active" data-target="form">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 
